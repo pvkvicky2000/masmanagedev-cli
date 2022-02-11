@@ -13,7 +13,7 @@ The vision for `masmanagedev-cli` is to provide a set of lifecycle tools for dev
 For installation, you need to check out the sources and then install it globally. This method will install it globally, but link back to your development sources, assuming that your development sources for `masmanagedev-cli` are in `~/masmanagedev-cli`.
 
 ```bash
-git clone https://github.com/nishi2go/masmanagedev-cli.git
+git clone https://github.com/pvkvicky2000/masmanagedev-cli.git
 cd masmanagedev-cli
 npm ci
 npm install file:./ -g
@@ -26,7 +26,7 @@ The following commands illustrate how to create a new add-on with Java support a
 When prompted, enter `BPAAA` for the prefix, and `bpaaa_myproduct` for the product. Be sure to also select `y` for `Java Support` and `y` for `Initialize eclipse projects`. When prompted for `maximo home`, you also need to enter the full location to where your local Maximo installation folder exists.
 
 ```bash
-$ npm install git+https://github.com/nishi2go/masmanagedev-cli.git -g
+$ npm install git+https://github.com/pvkvicky2000/masmanagedev-cli.git -g
 $ masmanagedev-cli create addon
 $ cd bpaa_myproduct
 $ masmanagedev-cli create sample-classic-app
@@ -184,7 +184,7 @@ For more information on developing add-ons and using dbc scripts, see the [Datab
 
 ## Issues and Suggestions
 
-This tool is open source, which means that you are free to extend it. You can even submit Pull Requests if you add a feature, or fix a bug. If you want to submit issues or suggestions, you can use the [Github Issues tab](https://github.com/nishi2go/masmanagedev-cli/issues).
+This tool is open source, which means that you are free to extend it. You can even submit Pull Requests if you add a feature, or fix a bug. If you want to submit issues or suggestions, you can use the [Github Issues tab](https://github.com/pvkvicky2000/masmanagedev-cli/issues).
 
 <!--
 These are ideas for other cli tools

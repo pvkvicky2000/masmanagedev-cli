@@ -17,7 +17,7 @@
   },
   "author": "sls@ca.ibm.com",
   "license": "MIT",
-  "repository": "nishi2go/masmanagedev-cli",
+  "repository": "pvkvicky2000/masmanagedev-cli",
   "dependencies": {
     "archive": "0.0.2",
     "archiver": "2.1.1",
