@@ -65,8 +65,9 @@ docker.ejectMaximo = (name, destFolder) => {
   return shell.exec(CMD, {silent:true});
 }
 
-docker.pull = (name, namespace, hostname) => {
-  return shell.exec(`docker pull ${hostname}/${namespace}/${name}`, { silent: true });
+docker.pull = (name, namespace, hostname, insecure=false) => {
+  const insecureOption = insecure ? '' : '';
+  return shell.exec(`docker pull ${hostname}/${namespace}/${name}`, { silent: false });
 }
 
 docker.run = (name, namespace, hostname) => {

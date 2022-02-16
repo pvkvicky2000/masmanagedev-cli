@@ -44,6 +44,13 @@ var schema = {
       message: "build tag",
       _cli: "tag",
     },
+    insecure: {
+      _prompt: false,
+      required: false,
+      default: "false",
+      message: "insecure communication",
+      _cli: "insecure",
+    },
   },
 };
 
@@ -78,11 +85,15 @@ function initialize_home(result) {
     return;
   }
 
-  const hostname = oc.registryLogin();
+  const hostname = oc.registryLogin(result.insecure);
+  if (!hostname) {
+    log.error(`OpenShift Registry login was failed.`);
+    return;
+  }
   const tag = result.tag ? result.tag : "latest";
   const image = `${result.instance}-${result.workspace}-admin:${tag}`;
 
-  let proc = docker.pull(image, namespace, hostname);
+  let proc = docker.pull(image, namespace, hostname, result.insecure);
   if (proc && proc.code !== 0) {
     log.error(
       `Could not pull the image from ${hostname}/${namespace}/${image}`

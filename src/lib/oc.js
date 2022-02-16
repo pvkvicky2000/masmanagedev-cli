@@ -35,9 +35,10 @@ oc.setNamespace = (namespace) => {
   return (ocProcess ? ocProcess.code : -1) === 0;
 };
 
-oc.registryLogin = () => {
+oc.registryLogin = (insecure = false) => {
+  const insecureOption = insecure ? "--skip-check" : "";
   const registry = shell
-    .exec("oc registry login", { silent: true })
+    .exec(`oc registry login ${insecureOption}`, { silent: false })
     .stdout.split(/(\s+)/)
     .filter((item) => {
       return item.trim().length > 0;

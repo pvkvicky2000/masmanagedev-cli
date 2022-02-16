@@ -32,7 +32,7 @@ var schema = {
     launch_point_type: {
       _prompt: false,
       description: "Launch point type",
-      pattern: /^[a-zA-Z_0-9]+$/, //Implement the right 
+      pattern: /^[a-zA-Z_0-9]+$/, //Implement the right
       message: 'There some types of launch points to execute scripts',
       required: true,
       _cli: 'launch_point_type',
@@ -41,7 +41,7 @@ var schema = {
     script_description: {
       description: "Automation Script purpose's description ",
       pattern: /^[a-zA-Z_0-9 ]+$/,
-      message: "Must provide a description about the automation scrip's purpose",
+      message: "Must provide a description about the automation script's purpose",
       required: true,
       default: "Brief comment about the automation script",
       _cli: 'script_description',
@@ -92,7 +92,7 @@ function create_script(result) {
   //populate results into the args value
   var args = Object.assign({}, env.props, result);
 
-  //Specialize the templates into sfv lib. 
+  //Specialize the templates into sfv lib.
   sfv.installTemplateSFV("script-field-validator", env.addonDir(), args);
 
 }
