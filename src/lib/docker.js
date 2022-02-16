@@ -70,6 +70,10 @@ docker.pull = (name, namespace, hostname, insecure=false) => {
   return shell.exec(`docker pull ${hostname}/${namespace}/${name}`, { silent: false });
 }
 
+docker.login = (hostname, username, password) => {
+  return shell.exec(`docker login -u ${username} -p ${password} ${hostname}`, { silent: false });
+}
+
 docker.run = (name, namespace, hostname) => {
   return shell.exec(`docker run --rm -d ${hostname}/${namespace}/${name}`, { silent: true });
 }

@@ -93,6 +93,9 @@ function initialize_home(result) {
   const tag = result.tag ? result.tag : "latest";
   const image = `${result.instance}-${result.workspace}-admin:${tag}`;
 
+  const username = oc.getUsername();
+  const password = oc.getPassword();
+  docker.login(hostname, username, password);
   let proc = docker.pull(image, namespace, hostname, result.insecure);
   if (proc && proc.code !== 0) {
     log.error(

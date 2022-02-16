@@ -186,3 +186,27 @@ oc.getCurrentConfig = (workSpace) => {
     return json2yaml.stringify(settings);
   }
 };
+
+oc.getUsername = () => {
+  const res = shell.exec(`oc whoami`, {
+    silent: true,
+  });
+  let username;
+  if (res && res.code === 0) {
+    username = res.stdout.trim();
+  }
+  return username;
+};
+
+oc.getPassword = () => {
+  const res = shell.exec(`oc whoami -t`, {
+    silent: true,
+  });
+  let password;
+  if (res && res.code === 0) {
+    password = res.stdout.trim();
+  }
+  return password;
+};
+
+
