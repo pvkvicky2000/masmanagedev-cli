@@ -36,7 +36,7 @@ oc.setNamespace = (namespace) => {
 };
 
 oc.registryLogin = (insecure = false) => {
-  const insecureOption = insecure ? "--skip-check" : "";
+  const insecureOption = insecure ? "--skip-check=true --insecure=true" : "";
   const registry = shell
     .exec(`oc registry login ${insecureOption}`, { silent: false })
     .stdout.split(/(\s+)/)
