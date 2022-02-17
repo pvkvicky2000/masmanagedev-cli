@@ -74,7 +74,7 @@ function create_package(result) {
         };
       });
   } else {
-    console.log('Package is note ready, please build the package before zip it (i.e. run masmanagedev build)');
+    console.log('Package is note ready, please build the package before zip it (i.e. run masmanagedev build) or move to the root directory of your project.');
     shell.exit(1);
   }//End ensure dir
 
