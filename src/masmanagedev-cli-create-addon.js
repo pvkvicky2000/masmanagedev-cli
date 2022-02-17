@@ -187,6 +187,7 @@ function create_addon(result) {
   }
 
   env.ensureAddonDir('resources/presentations');
+  env.ensureAddonDir('additional-server-files');
 
   log.info("Creating script dir");
   env.ensureDir(env.scriptDir());

@@ -15,7 +15,7 @@ const shell = require("shelljs");
 
 var schema = {
   _version: "0.0.1",
-  _description: "Maximo Home initialize support",
+  _description: "Maximo Home initialization support",
   properties: {
     dir: {
       required: true,
