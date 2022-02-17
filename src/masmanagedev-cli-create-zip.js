@@ -46,7 +46,7 @@ function create_package(result) {
   if (zip.ensureDir(build_dir)) {
 
     //Install templates
-    zip.installTemplateZIP("zip", env.addonDir(), args);
+    //zip.installTemplateZIP("zip", env.addonDir(), args);
 
     //Create tmp directory
     if (!env.ensureDir('tmp')) {
@@ -58,26 +58,25 @@ function create_package(result) {
     console.log('location %s', result.package_name)
     //Zip the content from a package int a file to be installed.
 
-
-
     zip.zipFolderContent('./tmp/' + result.package_name + '/', result.package_name + '.zip')
-      .then(function (base) {
+      .then(function () {
         console.log("Your package were created into the zip folder of this project. Unzip the package into MAXIMO's installation folder and then run the updatedb command to install it");
+        console.log("Moving %s to dist folder", result.package_name + '.zip ');
+        if (shell.exec('mv ' + result.package_name + '.zip dist/').code !== 0) {
+          shell.echo('Error: Move command fail commit failed');
+          shell.exit(1);
+        }
+      }).finally(function () {
+        console.log("Clean up ...");
+        if (shell.exec('rm -rf tmp/').code !== 0) {
+          shell.echo('Error: Removing tmp directory');
+          shell.exit(1);
+        };
       });
   } else {
     console.log('Package is note ready, please build the package before zip it (i.e. run masmanagedev build)');
+    shell.exit(1);
   }//End ensure dir
-
-  console.log("Moving %s to dist folder",  result.package_name + '.zip ');
-  if(shell.exec('mv ' + result.package_name + '.zip dist/').code !== 0) {
-    shell.echo('Error: Move command fail commit failed');
-    shell.exit(1);
-  }
-  console.log("Clean up ...");
-  if(shell.exec('rm -rf tmp/').code !== 0){
-    shell.echo('Error: Removing tmp directory');
-    shell.exit(1);
-  };
 
 };
 

@@ -193,33 +193,32 @@ zip.copyFolderRecursiveSync = function (source, target) {
  */
 zip.zipFolderContent = function (destDir, package_name) {
 
-    return new Promise(function (resolve, reject) {
-
+   return new Promise(function (resolve, reject) {
         var fileName = package_name;
         var fileOutput = fs.createWriteStream(fileName);
 
         fileOutput.on('close', function () {
             console.log(archive.pointer() + ' total bytes');
             console.log('archiver has been finalized and the output file descriptor has closed.');
+            resolve();
         });
+        archive.on('error', function (err) {
+            reject(err);
+        });
+
         archive.pipe(fileOutput);
+        // add as many as you like
         archive.glob('**/*', {
             cwd: 'dist/',
             ignore: ['*.zip']
         }, {});
-        // add as many as you like
-        archive.on('error', function (err) {
-            throw err;
-        });
         archive.finalize(function (err, bytes) {
-            if (err)
-                throw err;
+            if (err) {
+                reject(err);
+            }
             console.log('Package zip done:', base, bytes);
-            resolve(base);
         }).catch(function (err) {
             reject(err);
         });
     });
-
-
 };
