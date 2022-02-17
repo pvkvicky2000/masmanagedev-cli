@@ -79,6 +79,7 @@ function initialize_home(result) {
   }
 
   const hostname = oc.registryLogin();
+  log.info(`Hostname ${hostname}`)
   const tag = result.tag ? result.tag : "latest";
   const image = `${result.instance}-${result.workspace}-admin:${tag}`;
 

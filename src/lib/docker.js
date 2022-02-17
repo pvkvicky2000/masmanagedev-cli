@@ -66,7 +66,7 @@ docker.ejectMaximo = (name, destFolder) => {
 }
 
 docker.pull = (name, namespace, hostname) => {
-  return shell.exec(`docker pull ${hostname}/${namespace}/${name}`, { silent: true });
+  return shell.exec(`docker pull ${hostname}/${namespace}/${name}`, { silent: false });
 }
 
 docker.run = (name, namespace, hostname) => {

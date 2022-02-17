@@ -37,7 +37,7 @@ oc.setNamespace = (namespace) => {
 
 oc.registryLogin = () => {
   const registry = shell
-    .exec("oc registry login", { silent: true })
+    .exec("oc registry login --skip-check", { silent: true })
     .stdout.split(/(\s+)/)
     .filter((item) => {
       return item.trim().length > 0;
