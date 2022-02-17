@@ -35,9 +35,10 @@ oc.setNamespace = (namespace) => {
   return (ocProcess ? ocProcess.code : -1) === 0;
 };
 
-oc.registryLogin = () => {
+oc.registryLogin = (insecure = false) => {
+  const insecureOption = insecure ? "--skip-check=true --insecure=true" : "";
   const registry = shell
-    .exec("oc registry login", { silent: true })
+    .exec(`oc registry login ${insecureOption}`, { silent: false })
     .stdout.split(/(\s+)/)
     .filter((item) => {
       return item.trim().length > 0;
@@ -185,3 +186,27 @@ oc.getCurrentConfig = (workSpace) => {
     return json2yaml.stringify(settings);
   }
 };
+
+oc.getUsername = () => {
+  const res = shell.exec(`oc whoami`, {
+    silent: true,
+  });
+  let username;
+  if (res && res.code === 0) {
+    username = res.stdout.trim();
+  }
+  return username;
+};
+
+oc.getPassword = () => {
+  const res = shell.exec(`oc whoami -t`, {
+    silent: true,
+  });
+  let password;
+  if (res && res.code === 0) {
+    password = res.stdout.trim();
+  }
+  return password;
+};
+
+
