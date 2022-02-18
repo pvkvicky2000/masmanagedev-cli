@@ -34,6 +34,13 @@ var schema = {
       description: "maximo manage workspace name",
       _cli: "workspace",
     },
+    archive: {
+      _prompt: false,
+      required: false,
+      description: "Customization archive file name. If you do not specify the name, the latest archive file is automatically selected.",
+      _cli: "archive",
+    },
+ 
   },
 };
 
@@ -61,7 +68,16 @@ function deploy(result) {
 
   // Ensure zips in dist
   const buildDir = "dist/.";
-  const latestArchiveName = oc.getLatestArchiveName(buildDir);
+
+  let latestArchiveName = result.archive;
+  if (latestArchiveName && !fs.existsSync(path.join(buildDir, result.archive))) {
+    log.error(
+      `Could not find any customization archive. Please specify a valid archive name.`
+    );
+    return;
+  }
+
+  latestArchiveName = latestArchiveName ? latestArchiveName : oc.getLatestArchiveName(buildDir);
   if (!latestArchiveName) {
     log.error(
       `Could not find any customization archive. Please run the create zip command.`
