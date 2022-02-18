@@ -8,6 +8,7 @@
 
 const shell = require("shelljs");
 const env = require("./env");
+const templates = require("./templates");
 const fs = require("fs");
 const log = require("./logger");
 const json2yaml = require("json2yaml");
@@ -90,10 +91,31 @@ oc.newApp = (name) => {
   const res = shell.exec(`oc get deployments ${name}`, { silent: true });
 
   if (res && res.code !== 0) {
-    const created = shell.exec(`oc new-app ${name}`, { silent: false });
+    const created = shell.exec(`oc new-app --labels="app=${name}" ${name}`, { silent: false });
     if (created && created.code !== 0) {
       return false;
     }
+  }
+
+  return true;
+};
+
+oc.addNetworkPolicy = (name, templatepath, outputFile) => {
+  const res = shell.exec(`oc get networkpolicy ${name}-http`, { silent: true });
+
+  if (res && res.code !== 0) {
+    const args = {
+      name: name
+    }
+
+    templates.renderToFile(templatepath, args, outputFile);
+    
+    const created = shell.exec(`cat ${outputFile} | oc apply -f - `, { silent: false });
+    if (created && created.code !== 0) {
+      fs.rmSync(outputFile);
+      return false;
+    }
+    fs.rmSync(outputFile);
   }
 
   return true;
@@ -111,6 +133,15 @@ oc.expose = (name) => {
 
   return true;
 };
+
+oc.getServiceHostName = (name) => {
+  const res = shell.exec(` oc get svc ${name} -o go-template --template='{{.metadata.name}}.{{.metadata.namespace}}.svc{{println}}'`, {silent: true});
+  let hostname;
+  if (res && res.code === 0) {
+    hostname = res.stdout.trim();
+  }
+  return hostname;
+}
 
 oc.getRouteHostName = (name) => {
   const res = shell.exec(`oc get routes ${name} -o "jsonpath={.spec.host}"`, {

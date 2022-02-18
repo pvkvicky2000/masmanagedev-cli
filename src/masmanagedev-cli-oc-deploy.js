@@ -8,11 +8,11 @@
 
 const cli = require("./lib/cli");
 const env = require("./lib/env");
-const zip = require("./lib/zip");
+const fs = require('fs-extra');
 const log = require("./lib/logger");
 const oc = require("./lib/oc");
 const templates = require("./lib/templates");
-const shell = require("shelljs");
+const path = require('path');
 
 var schema = {
   _version: "0.0.1",
@@ -40,7 +40,13 @@ var schema = {
       description: "Customization archive file name. If you do not specify the name, the latest archive file is automatically selected.",
       _cli: "archive",
     },
- 
+    expose: {
+      _prompt: false,
+      description: "Expose the created HTTP service from the build?",
+      required: false,
+      _cli: 'expose',
+      _yesno: 'y',
+    }
   },
 };
 
@@ -106,15 +112,20 @@ function deploy(result) {
     return;
   }
 
+  if (!oc.addNetworkPolicy(buildName, "publisher/NetworkPolicy.yml.in", "tmpnp.yml")) {
+    log.error(`Could not upload a network policy: ${buildName}`);
+    return;
+  }
+
   // Check and make a route for the archive
-  if (!oc.expose(buildName)) {
+  if (env.bool(result.expose) && !oc.expose(buildName)) {
     log.error(`Could not expose a service: ${buildName}`);
     return;
   }
 
-  const hostname = oc.getRouteHostName(buildName.trim());
-  const url = `http://${hostname}/${latestArchiveName}`;
-  log.info(url);
+  const hostname = oc.getServiceHostName(buildName.trim());
+  const url = `http://${hostname}:8080/${latestArchiveName}`;
+  log.info(`Customization Archive URL: ${url}`);
   const manageWorkSpace = `${result.instance.trim()}-${result.workspace.trim()}`;
   // Update the deployment config
   if (!oc.updateCustomizationArchiveConfig(manageWorkSpace, url)) {
