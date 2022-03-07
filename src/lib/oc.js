@@ -78,6 +78,21 @@ oc.getLatestArchiveName = (dirName) => {
   }
 };
 
+oc.getAllArchiveNames = (dirName) => {
+  if (fs.existsSync(dirName)) {
+    const dir = fs.opendirSync(dirName);
+    const files = [];
+    let dirent;
+    while ((dirent = dir.readSync())) {
+      files.push(dirent.name);
+    }
+    return files
+      .filter((f) => f.endsWith(".zip"))
+      .sort();
+  }
+};
+
+
 oc.startBuild = (name, buildDir) => {
   const fullBuildPath = env.addonDir(buildDir);
   const res = shell.exec(
@@ -109,7 +124,7 @@ oc.addNetworkPolicy = (name, templatepath, outputFile) => {
     }
 
     templates.renderToFile(templatepath, args, outputFile);
-    
+
     const created = shell.exec(`cat ${outputFile} | oc apply -f - `, { silent: false });
     if (created && created.code !== 0) {
       fs.rmSync(outputFile);
@@ -135,7 +150,7 @@ oc.expose = (name) => {
 };
 
 oc.getServiceHostName = (name) => {
-  const res = shell.exec(` oc get svc ${name} -o go-template --template='{{.metadata.name}}.{{.metadata.namespace}}.svc{{println}}'`, {silent: true});
+  const res = shell.exec(` oc get svc ${name} -o go-template --template='{{.metadata.name}}.{{.metadata.namespace}}.svc{{println}}'`, { silent: true });
   let hostname;
   if (res && res.code === 0) {
     hostname = res.stdout.trim();
@@ -159,8 +174,47 @@ oc.extractMasNamespace = (namespace) => {
 };
 
 oc.updateCustomizationArchiveConfig = (workSpace, url) => {
+  const archiveStatus = shell.exec(
+    `oc get manageworkspace.apps.mas.ibm.com/${workSpace} -o jsonpath='{ .spec.settings.customizationList }'`,
+    { silent: true }
+  );
+
+  if (archiveStatus.stdout) {
+    const res = shell.exec(
+      `oc patch manageworkspace.apps.mas.ibm.com/${workSpace} --type json -p='[{"op": "remove", "path": "/spec/settings/customizationList"}]'`
+    );
+    if (!(res && res.code === 0)) {
+      return false;
+    }
+  }
+
   const res = shell.exec(
     `oc patch manageworkspace.apps.mas.ibm.com/${workSpace} --type merge -p '{"spec":{"settings":{"customization":{"customizationArchive":"${url}"}}}}'`
+  );
+  return res && res.code === 0;
+};
+
+oc.updateCustomizationListConfig = (workSpace, customizationList) => {
+  const singleArchiveStatus = shell.exec(
+    `oc get manageworkspace.apps.mas.ibm.com/${workSpace} -o jsonpath='{ .spec.settings.customization }'`,
+    { silent: true }
+  );
+  if (!(singleArchiveStatus && singleArchiveStatus.code === 0)) {
+    return false;
+  }
+
+  if (singleArchiveStatus.stdout) {
+    const res = shell.exec(
+      `oc patch manageworkspace.apps.mas.ibm.com/${workSpace} --type json -p='[{"op": "remove", "path": "/spec/settings/customization"}]'`
+    );
+    if (!(res && res.code === 0)) {
+      return false;
+    }
+  }
+
+  const body = JSON.stringify(customizationList);
+  const res = shell.exec(
+    `oc patch manageworkspace.apps.mas.ibm.com/${workSpace} --type merge -p '{"spec":{"settings":${body}}}'`
   );
   return res && res.code === 0;
 };
@@ -239,5 +293,3 @@ oc.getPassword = () => {
   }
   return password;
 };
-
-
