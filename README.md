@@ -53,11 +53,20 @@ $ masmanagedev-cli init home --instance crc --workspace dev --tag latest
 
 ### masmanagedev-cli oc deploy
 
-The `oc deploy` command deploys your [customization archive](https://www.ibm.com/docs/en/maximo-manage/8.1.0?topic=application-customization-archive-guidelines) to reflect your customization into your MAS workspace. This process will create an HTTP server to host your zip in the OpenShift cluster to share it with the Manage reconciliation process to recompile the Manage application and its container images. This command updates the customization section in Manage configuration to start reconciliation process automatically. It requires at least one zip file in the `dist` directory so you need to run the `create zip` command before starting it.
+The `oc deploy` command deploys your [customization archive](https://www.ibm.com/docs/en/maximo-manage/8.3.0?topic=application-customization-archive-guidelines) to reflect your customization into your MAS workspace. This process will create an HTTP server to host your zip in the OpenShift cluster to share it with the Manage reconciliation process to recompile the Manage application and its container images. This command updates the customization section in Manage configuration to start reconciliation process automatically. It requires at least one zip file in the `dist` directory so you need to run the `create zip` command before starting it.
 
 ```bash
 $ oc login
-$ masmanagedev-cli oc deploy --instance crc --workspace dev --build-name customization-archive
+$ masmanagedev-cli oc deploy --instance crc --workspace dev --build-name customization-archive --dir dist/
+```
+
+#### Multiple customization archives support
+
+Since MAS 8.7 and Maximo Manage 8.3, [multiple customization archives](https://www.ibm.com/docs/en/maximo-manage/8.3.0?topic=application-adding-customizations) are supported. You can deploy multiple zip files into the `maximo` container. `masmanagedev-cli` with `--mode all` option selects all `zip` files in `dist` directory. If you need to specify the order of archives, please rename the archive files in alphabetical order.
+
+```bash
+$ oc login
+$ masmanagedev-cli oc deploy --instance crc --workspace dev --build-name customization-archive --dir dist/ --mode all
 ```
 
 ### masmanagedev-cli update classpath
