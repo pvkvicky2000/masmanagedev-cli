@@ -71,7 +71,7 @@ $ masmanagedev-cli oc deploy --instance crc --workspace dev --build-name customi
 
 ### masmanagedev-cli update classpath
 
-The `update classpath` command updates deployment XML files to add your third-party jar files to `businessobjectclasspath`. This process will get the XML files from `MAXIMO_HOME` and add the files under `applications/maximko/lib` in your workspace. This command is intended to automate the process of the [guide](https://ibm-mas-manage.github.io/playbook/upgrade/addjar).
+The `update classpath` command updates deployment XML files to add your third-party jar files to `businessobjectclasspath`. This process will get the XML files from `MAXIMO_HOME` and add the files under `applications/maximo/lib` in your workspace. This command is intended to automate the process of the [guide](https://ibm-mas-manage.github.io/playbook/upgrade/addjar).
 
 ### masmanagedev-cli oc get-config
 
