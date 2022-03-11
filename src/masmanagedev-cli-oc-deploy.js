@@ -20,18 +20,18 @@ var schema = {
   properties: {
     buildName: {
       required: true,
-      description: "customization archive build config name",
+      description: "Customization archive build config name.",
       _cli: "build-name",
       default: "customization-archive",
     },
     instance: {
       required: true,
-      description: "maximo application suite instance name",
+      description: "Maximo Application Suite instance name.",
       _cli: "instance",
     },
     workspace: {
       required: true,
-      description: "maximo manage workspace name",
+      description: "Maximo Manage Workspace name.",
       _cli: "workspace",
     },
     archive: {
@@ -39,6 +39,22 @@ var schema = {
       required: false,
       description: "Customization archive file name. If you do not specify the name, the latest archive file is automatically selected.",
       _cli: "archive",
+    },
+    dir: {
+      _prompt: false,
+      required: false,
+      description: "The directory including Customization archive files.",
+      default: "dist/.",
+      _cli: "dir",
+    },
+    mode: {
+      required: false,
+      _prompt: false,
+      description: 'Select a mode to list customization archives under the dir. "latest" is selected the latest file name. "all" is listed all zip files under the dir. "all" is supported in MAS 8.7 or later.',
+      _cli: "mode",
+      default: "latest",
+      pattern: /^(latest|all)$/,
+      message: "mode must be a desinated string",
     },
     expose: {
       _prompt: false,
@@ -73,22 +89,29 @@ function deploy(result) {
   }
 
   // Ensure zips in dist
-  const buildDir = "dist/.";
+  const buildDir = result.dir;
 
-  let latestArchiveName = result.archive;
-  if (latestArchiveName && !fs.existsSync(path.join(buildDir, result.archive))) {
-    log.error(
-      `Could not find any customization archive. Please specify a valid archive name.`
-    );
-    return;
-  }
-
-  latestArchiveName = latestArchiveName ? latestArchiveName : oc.getLatestArchiveName(buildDir);
-  if (!latestArchiveName) {
-    log.error(
-      `Could not find any customization archive. Please run the create zip command.`
-    );
-    return;
+  const archiveList = [];
+  if (result.archive) {
+    if (!fs.existsSync(path.join(buildDir, result.archive))) {
+      log.error(`Could not find any customization archive. Please specify a valid archive name.`);
+      return;
+    }
+    archiveList.push(result.archive);
+  } else if (result.mode === "all") {
+    const _archiveList = oc.getAllArchiveNames(buildDir);
+    if (_archiveList && _archiveList.length === 0) {
+      log.error(`Could not find any customization archive. Please run the create zip command.`);
+      return;
+    }
+    archiveList.push(..._archiveList);
+  } else {
+    const archive = oc.getLatestArchiveName(buildDir);
+    if (!archive) {
+      log.error(`Could not find any customization archive. Please run the create zip command.`);
+      return;
+    }
+    archiveList.push(archive);
   }
 
   const buildName = result.buildName.trim();
@@ -124,12 +147,33 @@ function deploy(result) {
   }
 
   const hostname = oc.getServiceHostName(buildName.trim());
-  const url = `http://${hostname}:8080/${latestArchiveName}`;
+  const url = `http://${hostname}:8080/`;
   log.info(`Customization Archive URL: ${url}`);
+  log.info(`Archive list:`);
+  archiveList.forEach(archive => log.info(` - ${url}${archive}`));
   const manageWorkSpace = `${result.instance.trim()}-${result.workspace.trim()}`;
-  // Update the deployment config
-  if (!oc.updateCustomizationArchiveConfig(manageWorkSpace, url)) {
-    log.error(`Could not update the customization archive URL: ${url}`);
-    return;
+  if (archiveList.length > 1) {
+    const customizationList = {
+      customizationList:
+        archiveList.map(archive => {
+          const item = {
+            customizationArchiveName: archive.slice(0, archive.length - 4),
+            customizationArchiveUrl: `${url}${archive}`
+          };
+          return item;
+        })
+    };
+    // Update the deployment config
+    if (!oc.updateCustomizationListConfig(manageWorkSpace, customizationList)) {
+      log.error(`Could not update the customization archive URL: ${url}`);
+      return;
+    }
+  } else {
+    const archiveUrl = `${url}${archiveList[0]}`;
+    // Update the deployment config
+    if (!oc.updateCustomizationArchiveConfig(manageWorkSpace, archiveUrl)) {
+      log.error(`Could not update the customization archive URL: ${url}`);
+      return;
+    }
   }
 }

@@ -30,12 +30,12 @@ var schema = {
     },
     instance: {
       required: true,
-      description: "maximo application suite instance name",
+      description: "Maximo Application Suite instance name.",
       _cli: "instance",
     },
     workspace: {
       required: true,
-      description: "maximo manage workspace name",
+      description: "Maximo Manage Workspace name.",
       _cli: "workspace",
     },
   },
